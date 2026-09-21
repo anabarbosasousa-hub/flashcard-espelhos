@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcards: Óptica - Espelhos</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Link para o arquivo CSS externo -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
+    
+    <!-- Cabeçalho -->
+    <header class="border-b border-slate-800 bg-slate-950/50 backdrop-blur sticky top-0 z-10">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-indigo-600/20 text-indigo-400 rounded-xl border border-indigo-500/30">
+                    <i data-lucide="sparkles" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                        Flashcards de Óptica
+                    </h1>
+                    <p class="text-xs text-slate-400">Estudo Interativo: Espelhos Planos e Esféricos</p>
+                </div>
+            </div>
+
+            <!-- Filtro de Categorias -->
+            <div class="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
+                <button onclick="setCategory('all')" id="cat-all" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">
+                    Todos
+                </button>
+                <button onclick="setCategory('plano')" id="cat-plano" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition bg-slate-800 hover:bg-slate-700 text-slate-300">
+                    Planos
+                </button>
+                <button onclick="setCategory('concavo')" id="cat-concavo" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition bg-slate-800 hover:bg-slate-700 text-slate-300">
+                    Côncavos
+                </button>
+                <button onclick="setCategory('convexo')" id="cat-convexo" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition bg-slate-800 hover:bg-slate-700 text-slate-300">
+                    Convexos
+                </button>
+                <button onclick="setCategory('calculos')" id="cat-calculos" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition bg-slate-800 hover:bg-slate-700 text-slate-300">
+                    Equações
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 flex flex-col justify-between items-center gap-6">
+
+        <!-- Barra de Progresso e Estatísticas -->
+        <div class="w-full flex items-center justify-between text-sm text-slate-400">
+            <span id="card-counter" class="font-medium text-slate-300">Cartão 1 de 10</span>
+            <div class="flex items-center gap-4">
+                <button onclick="shuffleCards()" class="flex items-center gap-1.5 hover:text-indigo-400 transition" title="Embaralhar Cartões (R)">
+                    <i data-lucide="shuffle" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Embaralhar</span>
+                </button>
+                <button onclick="toggleMarched()" id="star-btn" class="flex items-center gap-1.5 hover:text-amber-400 transition" title="Marcar como Importante">
+                    <i data-lucide="bookmark" id="star-icon" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Salvar</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Área do Flashcard -->
+        <div class="w-full max-w-xl h-80 sm:h-96 perspective-1000 cursor-pointer group select-none" onclick="flipCard()">
+            <div id="card-inner" class="relative w-full h-full transform-style-3d duration-500 rounded-2xl shadow-2xl">
+
+                <!-- Frente do Cartão (Pergunta) -->
+                <div class="absolute inset-0 w-full h-full backface-hidden bg-slate-800 border-2 border-slate-700 hover:border-indigo-500/50 rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-colors shadow-indigo-500/5">
+                    <div class="flex items-center justify-between">
+                        <span id="card-tag" class="text-xs uppercase font-bold tracking-wider px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                            Categoria
+                        </span>
+                        <span class="text-xs text-slate-500 flex items-center gap-1">
+                            <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i> Clique para virar
+                        </span>
+                    </div>
+
+                    <div class="my-auto text-center">
+                        <h2 id="card-question" class="text-xl sm:text-2xl font-bold text-slate-100 leading-relaxed">
+                            Pergunta aqui...
+                        </h2>
+                    </div>
+
+                    <div class="text-center text-xs text-slate-500">
+                        Pressione <kbd class="px-1.5 py-0.5 bg-slate-700 text-slate-300 rounded text-[10px]">Espaço</kbd> para virar
+                    </div>
+                </div>
+
+                <!-- Verso do Cartão (Resposta) -->
+                <div class="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-indigo-950/80 to-slate-900 border-2 border-indigo-500/40 rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-indigo-500/10">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs uppercase font-bold tracking-wider px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            Resposta
+                        </span>
+                        <span class="text-xs text-slate-500 flex items-center gap-1">
+                            <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i> Clique para voltar
+                        </span>
+                    </div>
+
+                    <div class="my-auto text-center px-2">
+                        <p id="card-answer" class="text-lg sm:text-xl text-slate-200 leading-relaxed font-medium">
+                            Resposta aqui...
+                        </p>
+                    </div>
+
+                    <div class="text-center text-xs text-indigo-300/60">
+                        Conceito Fundamental de Óptica
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Controles de Navegação -->
+        <div class="flex items-center gap-4 sm:gap-6 mt-2">
+            <button onclick="prevCard()" class="p-3 sm:px-5 sm:py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold flex items-center gap-2 border border-slate-700 transition active:scale-95">
+                <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                <span class="hidden sm:inline">Anterior</span>
+            </button>
+
+            <button onclick="flipCard()" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition active:scale-95">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                <span>Girar Cartão</span>
+            </button>
+
+            <button onclick="nextCard()" class="p-3 sm:px-5 sm:py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold flex items-center gap-2 border border-slate-700 transition active:scale-95">
+                <span class="hidden sm:inline">Próximo</span>
+                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="border-t border-slate-800/80 py-4 text-center text-xs text-slate-500">
+        <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p>Dica: Use as setas <kbd class="px-1 bg-slate-800 rounded">←</kbd> <kbd class="px-1 bg-slate-800 rounded">→</kbd> do teclado para navegar.</p>
+            <p>Conteúdo de Física: Óptica Geométrica</p>]
+            <a href="agradecimento.html">
+            <button type="button">
+                <div class="agradecimento">Creditos</div>
+    </button></a>
+            
+    </a>
+        </div>
+    </footer>
+
+    <!-- Importação do arquivo JavaScript externo -->
+    <script src="script.js"></script>
+</body>
+</html>
